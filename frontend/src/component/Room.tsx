@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Socket, io } from "socket.io-client";
-
+import "../styles/Room.css";
 const URL = "http://localhost:3000";
 
 export const Room = ({
@@ -23,6 +23,10 @@ export const Room = ({
     const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream | null>(null);
     const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
     const localVideoRef = useRef<HTMLVideoElement | null>(null);
+    const [isAudioMuted, setIsAudioMuted] = useState(false);
+    const [isVideoOff, setIsVideoOff] = useState(false);
+    const [connectionStatus, setConnectionStatus] = useState("Initializing...");
+
 
     useEffect(() => {
         const socket = io(URL);
@@ -199,13 +203,64 @@ export const Room = ({
         }
     }, [localVideoRef])
 
-    return <div>
-        Hi {name}
-        <div>
-    <video autoPlay width={400} height={400} ref={localVideoRef} />
-    {lobby ? "Waiting to connect you to someone" : null}
-    <video autoPlay width={400} height={400} ref={remoteVideoRef} />
-</div>
-    </div>
+    const toggleAudio = () => {
+        if (localAudioTrack) {
+            localAudioTrack.enabled = !localAudioTrack.enabled;
+            setIsAudioMuted(!isAudioMuted);
+        }
+    };
+
+    const toggleVideo = () => {
+        if (localVideoTrack) {
+            localVideoTrack.enabled = !localVideoTrack.enabled;
+            setIsVideoOff(!isVideoOff);
+        }
+    };
+
+    useEffect(() => {
+        // Update connection status
+        if (lobby) {
+            setConnectionStatus("Waiting to connect you to someone...");
+        } else if (remoteVideoTrack && remoteAudioTrack) {
+            setConnectionStatus("Connected");
+        } else {
+            setConnectionStatus("Connecting...");
+        }
+    }, [lobby, remoteVideoTrack, remoteAudioTrack]);
+
+    return (
+        <div className="room-container">
+            <h1>VChat Room</h1>
+            <p>Welcome, {name}</p>
+            <p aria-live="polite" className="status-message">{connectionStatus}</p>
+            <div className="video-grid">
+                <div className="video-container local-video">
+                    <video
+                        autoPlay
+                        muted
+                        ref={localVideoRef}
+                        className={isVideoOff ? "video-off" : ""}
+                    />
+                    <div className="video-controls">
+                        <button onClick={toggleAudio} aria-label={isAudioMuted ? "Unmute audio" : "Mute audio"}>
+                            {isAudioMuted ? "🔇" : "🔊"}
+                        </button>
+                        <button onClick={toggleVideo} aria-label={isVideoOff ? "Turn on video" : "Turn off video"}>
+                            {isVideoOff ? "📷" : "🎥"}
+                        </button>
+                    </div>
+                    <p>You</p>
+                </div>
+                <div className="video-container remote-video">
+                    {remoteVideoTrack ? (
+                        <video autoPlay ref={remoteVideoRef} />
+                    ) : (
+                        <div className="placeholder">Waiting for peer...</div>
+                    )}
+                    <p>Peer</p>
+                </div>
+            </div>
+        </div>
+    );
 }
 
