@@ -21,8 +21,8 @@ export const Room = ({
     const [remoteVideoTrack, setRemoteVideoTrack] = useState<MediaStreamTrack | null>(null);
     const [remoteAudioTrack, setRemoteAudioTrack] = useState<MediaStreamTrack | null>(null);
     const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream | null>(null);
-    const remoteVideoRef = useRef<HTMLVideoElement>();
-    const localVideoRef = useRef<HTMLVideoElement>();
+    const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
+    const localVideoRef = useRef<HTMLVideoElement | null>(null);
 
     useEffect(() => {
         const socket = io(URL);
@@ -201,9 +201,11 @@ export const Room = ({
 
     return <div>
         Hi {name}
-        <video autoPlay width={400} height={400} ref={localVideoRef} />
-        {lobby ? "Waiting to connect you to someone" : null}
-        <video autoPlay width={400} height={400} ref={remoteVideoRef} />
+        <div>
+    <video autoPlay width={400} height={400} ref={localVideoRef} />
+    {lobby ? "Waiting to connect you to someone" : null}
+    <video autoPlay width={400} height={400} ref={remoteVideoRef} />
+</div>
     </div>
 }
 

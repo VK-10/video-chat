@@ -1,4 +1,4 @@
-import { User } from "./UserManger";
+import { User } from "./UserManagers";
 
 let GLOBAL_ROOM_ID = 1;
 
