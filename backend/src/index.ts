@@ -6,7 +6,9 @@ import { Server } from 'socket.io';
 import { UserManager } from "./managers/UserManagers";
 
 const app = express();
-const server = http.createServer(http);
+const server = http.createServer(app);
+const port = process.env.PORT || 4000;
+
 
 const io = new Server(server, {
   cors: {
@@ -25,6 +27,6 @@ io.on('connection', (socket: Socket) => {
   })
 });
 
-server.listen(3000, () => {
+server.listen(port, () => {
     console.log('listening on *:3000');
 });

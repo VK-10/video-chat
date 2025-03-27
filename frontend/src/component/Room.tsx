@@ -36,17 +36,19 @@ export const Room = ({
             const pc = new RTCPeerConnection();
 
             setSendingPc(pc);
+
             if (localVideoTrack) {
-                console.error("added tack");
-                console.log(localVideoTrack)
+                // console.error("added tack");
+                // console.log(localVideoTrack)
                 pc.addTrack(localVideoTrack)
             }
             if (localAudioTrack) {
-                console.error("added tack");
-                console.log(localAudioTrack)
+                // console.error("added tack");
+                // console.log(localAudioTrack)
                 pc.addTrack(localAudioTrack)
             }
 
+            //Handle ICE candidates for the sending peer
             pc.onicecandidate = async (e) => {
                 console.log("receiving ice candidate locally");
                 if (e.candidate) {
@@ -54,9 +56,9 @@ export const Room = ({
                     candidate: e.candidate,
                     type: "sender",
                     roomId
-                   })
+                   });
                 }
-            }
+            };
 
             pc.onnegotiationneeded = async () => {
                 console.log("on negotiation neeeded, sending offer");
@@ -108,12 +110,12 @@ export const Room = ({
                 if (!e.candidate) {
                     return;
                 }
-                console.log("omn ice candidate on receiving seide");
+                console.log("omn ice candidate on receiving side");
                 if (e.candidate) {
                    socket.emit("add-ice-candidate", {
                     candidate: e.candidate,
                     type: "receiver",
-                    roomId
+                    roomId,
                    })
                 }
             }
